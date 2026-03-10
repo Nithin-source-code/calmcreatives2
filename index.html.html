@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CALM — Creative Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --black: #0a0a0a;
+    --white: #f5f0e8;
+    --accent: #ff4d1c;
+    --accent2: #ffd166;
+    --gray: #1a1a1a;
+    --muted: #444;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--black);
+    color: var(--white);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    overflow-x: hidden;
+    cursor: none;
+  }
+
+  /* Custom cursor */
+  .cursor {
+    position: fixed;
+    width: 12px; height: 12px;
+    background: var(--accent);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+    transition: transform 0.1s ease;
+  }
+  .cursor-ring {
+    position: fixed;
+    width: 36px; height: 36px;
+    border: 1px solid rgba(255,77,28,0.5);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: transform 0.15s ease, width 0.3s, height 0.3s, border-color 0.3s;
+  }
+  body:hover .cursor-ring { border-color: var(--accent); }
+
+  /* Noise overlay */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.5;
+  }
+
+  /* NAV */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 24px 48px;
+    mix-blend-mode: normal;
+    background: linear-gradient(to bottom, rgba(10,10,10,0.9), transparent);
+  }
+  .nav-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+  .nav-logo span { color: var(--accent); }
+  nav ul { display: flex; gap: 36px; list-style: none; }
+  nav ul a {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    color: var(--muted);
+    transition: color 0.3s;
+  }
+  nav ul a:hover { color: var(--accent); }
+
+  /* HERO */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding: 0 48px 80px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero-bg-text {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(120px, 20vw, 280px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.04);
+    white-space: nowrap;
+    user-select: none;
+    letter-spacing: 10px;
+    animation: floatText 8s ease-in-out infinite;
+  }
+  @keyframes floatText {
+    0%, 100% { transform: translate(-50%, -50%) translateY(0); }
+    50% { transform: translate(-50%, -50%) translateY(-20px); }
+  }
+
+  .hero-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.2s forwards;
+  }
+  .hero-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(64px, 10vw, 140px);
+    line-height: 0.9;
+    letter-spacing: 2px;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.4s forwards;
+  }
+  .hero-title .accent { color: var(--accent); }
+  .hero-title .outline {
+    color: transparent;
+    -webkit-text-stroke: 2px var(--white);
+  }
+  .hero-sub {
+    margin-top: 32px;
+    max-width: 480px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #888;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.6s forwards;
+  }
+  .hero-cta {
+    margin-top: 48px;
+    display: flex;
+    gap: 20px;
+    align-items: center;
+    opacity: 0;
+    animation: fadeUp 0.8s 0.8s forwards;
+  }
+  .btn-primary {
+    background: var(--accent);
+    color: var(--white);
+    padding: 16px 36px;
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    text-decoration: none;
+    clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 12px, 100% 100%, 12px 100%, 0 calc(100% - 12px));
+    transition: background 0.3s, transform 0.2s;
+  }
+  .btn-primary:hover { background: #e63e0e; transform: translateY(-2px); }
+  .btn-secondary {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s;
+  }
+  .btn-secondary:hover { color: var(--white); }
+  .btn-secondary::after { content: '→'; }
+
+  .hero-scroll {
+    position: absolute;
+    right: 48px;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    animation: fadeUp 0.8s 1.2s forwards;
+  }
+  .scroll-line {
+    width: 1px;
+    height: 60px;
+    background: linear-gradient(to bottom, transparent, var(--accent));
+    animation: scrollPulse 2s ease-in-out infinite;
+  }
+  @keyframes scrollPulse {
+    0%, 100% { opacity: 0.3; }
+    50% { opacity: 1; }
+  }
+  .scroll-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--muted);
+    writing-mode: vertical-rl;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* SERVICES */
+  .section { padding: 120px 48px; }
+  .section-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 60px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  .section-label::after {
+    content: '';
+    flex: 1;
+    max-width: 60px;
+    height: 1px;
+    background: var(--accent);
+    opacity: 0.4;
+  }
+
+  .services-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2px;
+  }
+  .service-card {
+    background: var(--gray);
+    padding: 48px 36px;
+    position: relative;
+    overflow: hidden;
+    transition: background 0.4s;
+    cursor: none;
+  }
+  .service-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.4s ease;
+  }
+  .service-card:hover::before { transform: scaleX(1); }
+  .service-card:hover { background: #1f1f1f; }
+
+  .service-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 64px;
+    color: rgba(255,255,255,0.04);
+    line-height: 1;
+    margin-bottom: 24px;
+    transition: color 0.4s;
+  }
+  .service-card:hover .service-num { color: rgba(255,77,28,0.08); }
+  .service-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 2px;
+    margin-bottom: 16px;
+    color: var(--white);
+  }
+  .service-desc {
+    font-size: 13px;
+    line-height: 1.8;
+    color: #666;
+  }
+  .service-price {
+    margin-top: 32px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: var(--accent2);
+  }
+
+  /* WORK */
+  .work-grid {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 4px;
+  }
+  .work-item {
+    background: var(--gray);
+    aspect-ratio: 16/9;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding: 32px;
+    cursor: none;
+  }
+  .work-item:first-child { grid-row: span 2; aspect-ratio: unset; }
+  .work-item-bg {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, #1a1a1a 0%, #111 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 80px;
+    color: rgba(255,255,255,0.03);
+    letter-spacing: 6px;
+    transition: transform 0.6s ease;
+  }
+  .work-item:hover .work-item-bg { transform: scale(1.05); }
+  .work-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 60%);
+  }
+  .work-info {
+    position: relative;
+    z-index: 1;
+  }
+  .work-tag {
+    font-family: 'Space Mono', monospace;
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 8px;
+  }
+  .work-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 28px;
+    letter-spacing: 1px;
+    color: var(--white);
+  }
+
+  /* BRAND BLOCKS */
+  .brand-block { margin-bottom: 80px; }
+  .brand-label { display: flex; align-items: center; gap: 20px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #222; }
+  .brand-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--accent); line-height: 1; opacity: 0.4; }
+  .brand-name { font-family: 'Bebas Neue', sans-serif; font-size: 28px; letter-spacing: 3px; color: var(--white); }
+  .brand-niche { font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; text-transform: uppercase; color: #555; margin-top: 4px; }
+  .brand-grid { display: grid; gap: 4px; }
+  .brand-grid.four-col { grid-template-columns: repeat(4, 1fr); }
+  .brand-grid.two-col { grid-template-columns: repeat(2, 1fr); }
+  .work-item { background: var(--gray); aspect-ratio: 1/1; position: relative; overflow: hidden; display: flex; align-items: flex-end; padding: 20px; cursor: none; }
+  .work-item img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+  .work-item:hover img { transform: scale(1.05); }
+  .work-item::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 55%); z-index: 1; }
+
+  /* ABOUT */
+  .about-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 80px;
+    align-items: center;
+  }
+  .about-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 6vw, 80px);
+    line-height: 0.95;
+    margin-bottom: 32px;
+  }
+  .about-title .accent { color: var(--accent); }
+  .about-body {
+    font-size: 14px;
+    line-height: 1.9;
+    color: #777;
+    margin-bottom: 24px;
+  }
+  .about-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-top: 48px;
+    padding-top: 48px;
+    border-top: 1px solid #222;
+  }
+  .stat-num {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 52px;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .stat-label {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #555;
+    margin-top: 6px;
+  }
+  .skills-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .skill-item {
+    background: var(--gray);
+    padding: 20px 28px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: background 0.3s, padding-left 0.3s;
+  }
+  .skill-item:hover { background: #222; padding-left: 36px; }
+  .skill-name {
+    font-family: 'Space Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: var(--white);
+  }
+  .skill-level {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    color: var(--accent);
+    letter-spacing: 1px;
+  }
+
+  /* CONTACT */
+  .contact-section {
+    padding: 120px 48px;
+    background: var(--gray);
+    position: relative;
+    overflow: hidden;
+  }
+  .contact-section::before {
+    content: 'LET\'S TALK';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(80px, 15vw, 200px);
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255,255,255,0.03);
+    white-space: nowrap;
+    user-select: none;
+    letter-spacing: 10px;
+  }
+  .contact-inner {
+    position: relative;
+    z-index: 1;
+    text-align: center;
+  }
+  .contact-title {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(48px, 8vw, 100px);
+    line-height: 0.95;
+    margin-bottom: 24px;
+  }
+  .contact-title span { color: var(--accent); }
+  .contact-sub {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 48px;
+    max-width: 400px;
+    margin-left: auto;
+    margin-right: auto;
+    line-height: 1.8;
+  }
+  .contact-email {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: clamp(20px, 3vw, 36px);
+    letter-spacing: 2px;
+    color: var(--white);
+    text-decoration: none;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 4px;
+    transition: color 0.3s;
+  }
+  .contact-email:hover { color: var(--accent); }
+  .contact-links {
+    display: flex;
+    justify-content: center;
+    gap: 48px;
+    margin-top: 60px;
+  }
+  .contact-link {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: #555;
+    text-decoration: none;
+    transition: color 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .contact-link:hover { color: var(--accent); }
+  .contact-link::before { content: '↗'; }
+
+  /* FOOTER */
+  footer {
+    padding: 32px 48px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid #1a1a1a;
+  }
+  .footer-logo {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 20px;
+    letter-spacing: 4px;
+    color: var(--white);
+  }
+  .footer-logo span { color: var(--accent); }
+  .footer-copy {
+    font-family: 'Space Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    color: #333;
+  }
+
+  /* MARQUEE */
+  .marquee-section {
+    padding: 32px 0;
+    background: var(--accent);
+    overflow: hidden;
+    white-space: nowrap;
+  }
+  .marquee-track {
+    display: inline-flex;
+    animation: marquee 20s linear infinite;
+  }
+  .marquee-item {
+    font-family: 'Bebas Neue', sans-serif;
+    font-size: 18px;
+    letter-spacing: 4px;
+    color: var(--black);
+    padding: 0 40px;
+  }
+  .marquee-dot {
+    color: rgba(0,0,0,0.3);
+  }
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    nav { padding: 20px 24px; }
+    nav ul { display: none; }
+    .hero, .section { padding-left: 24px; padding-right: 24px; }
+    .services-grid { grid-template-columns: 1fr; }
+    .work-grid { grid-template-columns: 1fr; }
+    .work-item:first-child { grid-row: auto; }
+    .about-grid { grid-template-columns: 1fr; gap: 48px; }
+    .contact-section { padding: 80px 24px; }
+    footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    .hero-scroll { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">CALM <span>CREATIVES</span></div>
+  <ul>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#work">Work</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg-text">CREATIVE</div>
+  <p class="hero-tag">Available Worldwide — Remote & International</p>
+  <h1 class="hero-title">
+    Designs That<br>
+    <span class="accent">Convert.</span><br>
+    <span class="outline">Stories That Stick.</span>
+  </h1>
+  <p class="hero-sub">
+    I'm Nithin — a graphic designer, content creator & digital marketer helping brands 
+    look sharp and grow faster. From scroll-stopping visuals to ad copy that sells.
+  </p>
+  <div class="hero-cta">
+    <a href="#contact" class="btn-primary">Start a Project</a>
+    <a href="#work" class="btn-secondary">See My Work</a>
+  </div>
+  <div class="hero-scroll">
+    <div class="scroll-line"></div>
+    <span class="scroll-text">Scroll</span>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-section">
+  <div class="marquee-track">
+    <span class="marquee-item">Graphic Design <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Content Creation <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Digital Marketing <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Ad Copywriting <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Script Writing <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Brand Identity <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Social Media <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Graphic Design <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Content Creation <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Digital Marketing <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Ad Copywriting <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Script Writing <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Brand Identity <span class="marquee-dot">◆</span></span>
+    <span class="marquee-item">Social Media <span class="marquee-dot">◆</span></span>
+  </div>
+</div>
+
+<!-- SERVICES -->
+<section class="section" id="services">
+  <div class="section-label">What I Do</div>
+  <div class="services-grid">
+    <div class="service-card">
+      <div class="service-num">01</div>
+      <div class="service-title">Graphic Design</div>
+      <p class="service-desc">Brand identities, social media templates, posters, flyers, and everything visual. Clean. Bold. Memorable.</p>
+      <div class="service-price">Starting $150 <span style="color:#555;font-size:11px;">/ ₹3,000</span></div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">02</div>
+      <div class="service-title">Content & Scripts</div>
+      <p class="service-desc">Captions that hook, scripts that sell, copy that converts. Words that make your audience stop scrolling.</p>
+      <div class="service-price">Starting $50 <span style="color:#555;font-size:11px;">/ ₹500 per piece</span></div>
+    </div>
+    <div class="service-card">
+      <div class="service-num">03</div>
+      <div class="service-title">Digital Marketing</div>
+      <p class="service-desc">Social media strategy, content calendars, ad creatives, and campaign management to grow your brand online.</p>
+      <div class="service-price">Starting $300 <span style="color:#555;font-size:11px;">/ ₹4,000 per month</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- WORK -->
+<section class="section" id="work" style="padding-top: 0;">
+  <div class="section-label">Selected Work</div>
+
+  <!-- ZESTO -->
+  <div class="brand-block">
+    <div class="brand-label">
+      <span class="brand-num">01</span>
+      <div>
+        <div class="brand-name">ZESTO</div>
+        <div class="brand-niche">Restaurant / Food</div>
+      </div>
+    </div>
+    <div class="brand-grid four-col">
+      <div class="work-item">
+        <img src="images/zesto1.png" alt="Zesto Combo" loading="lazy">
+        <div class="work-info"><div class="work-tag">Social Post</div><div class="work-title">Combo Deals</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/zesto2.png" alt="Zesto Review" loading="lazy">
+        <div class="work-info"><div class="work-tag">Review Card</div><div class="work-title">Customer Review</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/zesto3.png" alt="Zesto Special" loading="lazy">
+        <div class="work-info"><div class="work-tag">Story</div><div class="work-title">Today's Special</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/zesto4.png" alt="Zesto Weekend" loading="lazy">
+        <div class="work-info"><div class="work-tag">Banner</div><div class="work-title">Weekend Offer</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- IRONEDGE -->
+  <div class="brand-block">
+    <div class="brand-label">
+      <span class="brand-num">02</span>
+      <div>
+        <div class="brand-name">IRONEDGE</div>
+        <div class="brand-niche">Gym / Fitness</div>
+      </div>
+    </div>
+    <div class="brand-grid two-col">
+      <div class="work-item">
+        <img src="images/ironedgym1.png" alt="IronEdge Member" loading="lazy">
+        <div class="work-info"><div class="work-tag">Offer</div><div class="work-title">New Member Discount</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/ironedgym2.png" alt="IronEdge Free Trial" loading="lazy">
+        <div class="work-info"><div class="work-tag">Campaign</div><div class="work-title">Free Trial</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- THREAD & CO. -->
+  <div class="brand-block">
+    <div class="brand-label">
+      <span class="brand-num">03</span>
+      <div>
+        <div class="brand-name">THREAD & CO.</div>
+        <div class="brand-niche">Clothing / Fashion</div>
+      </div>
+    </div>
+    <div class="brand-grid two-col">
+      <div class="work-item">
+        <img src="images/thread1.png" alt="Thread New Collection" loading="lazy">
+        <div class="work-info"><div class="work-tag">Launch</div><div class="work-title">New Collection</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/thread2.png" alt="Thread Sale" loading="lazy">
+        <div class="work-info"><div class="work-tag">Offer</div><div class="work-title">Sale Campaign</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- GLOW STUDIO -->
+  <div class="brand-block">
+    <div class="brand-label">
+      <span class="brand-num">04</span>
+      <div>
+        <div class="brand-name">GLOW STUDIO</div>
+        <div class="brand-niche">Salon / Beauty</div>
+      </div>
+    </div>
+    <div class="brand-grid two-col">
+      <div class="work-item">
+        <img src="images/glow1.png" alt="Glow Before After" loading="lazy">
+        <div class="work-info"><div class="work-tag">Transform</div><div class="work-title">Before & After</div></div>
+      </div>
+      <div class="work-item">
+        <img src="images/glow2.png" alt="Glow Book Now" loading="lazy">
+        <div class="work-info"><div class="work-tag">CTA</div><div class="work-title">Book Now</div></div>
+      </div>
+    </div>
+  </div>
+
+  <p style="margin-top: 24px; font-family: 'Space Mono', monospace; font-size: 10px; letter-spacing: 2px; color: #444; text-transform: uppercase;">
+    * Portfolio updated regularly — DM for latest samples
+  </p>
+</section>
+
+<!-- ABOUT -->
+<section class="section" id="about">
+  <div class="section-label">About Me</div>
+  <div class="about-grid">
+    <div>
+      <h2 class="about-title">
+        Creative with<br>
+        a <span class="accent">Business</span><br>
+        Mind.
+      </h2>
+      <p class="about-body">
+        I'm Nithin — 21, self-taught, and obsessed with making brands look and sound their best. 
+        I combine strong visual design with sharp content strategy to help businesses 
+        actually grow — not just look good.
+      </p>
+      <p class="about-body">
+        Based in India, working with clients worldwide. Whether you're a local business 
+        or an international brand — if you need creative that converts, let's talk.
+      </p>
+      <div class="about-stats">
+        <div>
+          <div class="stat-num">3+</div>
+          <div class="stat-label">Skills Combined</div>
+        </div>
+        <div>
+          <div class="stat-num">100%</div>
+          <div class="stat-label">Client Focus</div>
+        </div>
+        <div>
+          <div class="stat-num">21</div>
+          <div class="stat-label">Years Young</div>
+        </div>
+        <div>
+          <div class="stat-num">∞</div>
+          <div class="stat-label">Ideas Ready</div>
+        </div>
+      </div>
+    </div>
+    <div class="skills-list">
+      <div class="skill-item">
+        <span class="skill-name">Graphic Design</span>
+        <span class="skill-level">PRO</span>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Content Writing</span>
+        <span class="skill-level">PRO</span>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Ad Copywriting</span>
+        <span class="skill-level">STRONG</span>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Digital Marketing</span>
+        <span class="skill-level">STRONG</span>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Script Writing</span>
+        <span class="skill-level">STRONG</span>
+      </div>
+      <div class="skill-item">
+        <span class="skill-name">Brand Strategy</span>
+        <span class="skill-level">GROWING</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact-section" id="contact">
+  <div class="contact-inner">
+    <h2 class="contact-title">
+      Ready to<br>
+      <span>Work Together?</span>
+    </h2>
+    <p class="contact-sub">
+      Got a project in mind? A brand to build? Content to create?<br>
+      Let's make something great.
+    </p>
+    <a href="/cdn-cgi/l/email-protection#457772722b2c312d2c2b37242f052228242c296b262a28" class="contact-email"><span class="__cf_email__" data-cfemail="fbc9cccc95928f939295899a91bb9c969a9297d5989496">[email&#160;protected]</span></a>
+    <div class="contact-links">
+      <a href="#" class="contact-link">Instagram</a>
+      <a href="#" class="contact-link">LinkedIn</a>
+      <a href="#" class="contact-link">WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">CALM <span>CREATIVES</span></div>
+  <div class="footer-copy">© 2025 Calm Creatives — All rights reserved</div>
+</footer>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+  // Custom cursor
+  const cursor = document.getElementById('cursor');
+  const ring = document.getElementById('cursorRing');
+  let mx = 0, my = 0, rx = 0, ry = 0;
+
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top = my + 'px';
+  });
+
+  function animateRing() {
+    rx += (mx - rx) * 0.12;
+    ry += (my - ry) * 0.12;
+    ring.style.left = rx + 'px';
+    ring.style.top = ry + 'px';
+    requestAnimationFrame(animateRing);
+  }
+  animateRing();
+
+  // Hover effects
+  document.querySelectorAll('a, button, .service-card, .work-item, .skill-item').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(2)';
+      ring.style.width = '60px';
+      ring.style.height = '60px';
+    });
+    el.addEventListener('mouseleave', () => {
+      cursor.style.transform = 'translate(-50%, -50%) scale(1)';
+      ring.style.width = '36px';
+      ring.style.height = '36px';
+    });
+  });
+
+  // Scroll reveal
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(
